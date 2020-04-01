@@ -27,6 +27,45 @@ while (have_posts()) {
     </div>
 
     <?php
+    $professors = new WP_Query([
+      'posts_per_page' => -1,
+      'post_type' => 'professor',
+      'orderby' => 'title',
+      'order' => 'ASC',
+      'meta_query' => [
+        [
+          'key' => 'related_programs',
+          'compare' => 'LIKE',
+          'value' => '"' . get_the_ID() . '"'
+        ]
+      ],
+    ]);
+
+    if ($professors->have_posts()) {
+      echo "
+    <hr class='section-break'>
+    <h2 class='headline headline--medium'>" . get_the_title() . " Professors</h2>
+    <ul class='professor-cards'>
+    ";
+
+      while ($professors->have_posts()) {
+        $professors->the_post();
+    ?>
+
+        <li class="professor-card__list-item">
+          <a class="professor-card" href="<?php the_permalink(); ?>">
+            <img class="professor-card__image" src="<?php the_post_thumbnail_url('professor-landscape'); ?>">
+            <span class="professor-card__name"><?php the_title(); ?></span>
+          </a>
+        </li>
+
+      <?php
+      }
+      echo "</ul>";
+    }
+
+    wp_reset_postdata();
+
     $events = new WP_Query([
       'posts_per_page' => 2,
       'post_type' => 'event',
@@ -55,7 +94,7 @@ while (have_posts()) {
 
       while ($events->have_posts()) {
         $events->the_post();
-    ?>
+      ?>
 
         <div class="event-summary">
           <a class="event-summary__date t-center" href="<?php the_permalink(); ?>">
