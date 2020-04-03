@@ -32,6 +32,7 @@ function pageBanner($args = NULL)
 
 function university_files()
 {
+  wp_enqueue_script('google-map', '//maps.googleapis.com/maps/api/js?key=AIzaSyAoGlSJuWN6Fc2BJOfrIP92DWU18ybsUEo', NULL, '1.0', true);
   wp_enqueue_script('main-js', get_theme_file_uri('/js/scripts-bundled.js'), NULL, '1.0', true);
   wp_enqueue_style('google_fonts', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
   wp_enqueue_style('font_awesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
@@ -69,6 +70,17 @@ function university_adjust_queries($query)
     $query->set('order', 'ASC');
     $query->set('posts_per_page', -1);
   }
+  if (!is_admin() && is_post_type_archive('campus') && $query->is_main_query()) {
+    $query->set('posts_per_page', -1);
+  }
 }
 
 add_action('pre_get_posts', 'university_adjust_queries');
+
+function university_api_key($api)
+{
+  $api['key'] = 'AIzaSyAoGlSJuWN6Fc2BJOfrIP92DWU18ybsUEo';
+  return $api;
+}
+
+add_filter('acf/fields/google_map/api', 'university_api_key');
