@@ -89,7 +89,21 @@ while (have_posts()) {
       }
     }
 
+    wp_reset_postdata();
 
+    $campuses = get_field('related_campus');
+
+    if ($campuses) {
+      echo "
+      <hr class='section-break'>
+      <h2 class='headline headline--medium'>" . get_the_title() . " is Available At These Campuses:</h2>
+      <ul class='min-list link-list'>
+      ";
+      foreach ($campuses as $campus) {
+        echo "<li><a href='" . get_the_permalink($campus) . "'>" . get_the_title($campus) . "</a></li>";
+      }
+      echo "</ul>";
+    }
     ?>
 
 
