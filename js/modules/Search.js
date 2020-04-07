@@ -93,6 +93,29 @@ class Search {
 
 
             <h2 class="search-overlay__section-title">Professors</h2>
+
+            ${
+              data.professors.length
+                ? '<ul class="professor-cards">'
+                : '<p>No results.</p>'
+            }
+              ${data.professors
+                .map(
+                  (item) =>
+                    `
+                    <li class="professor-card__list-item">
+                      <a class="professor-card" href="${item.permalink}">
+                        <img class="professor-card__image" src="${item.img}">
+                        <span class="professor-card__name">${item.title}</span>
+                      </a>
+                    </li>
+                    `
+                )
+                .join('')}
+      
+              ${data.professors.length ? '</ul>' : ''}
+
+
           </div>
 
           <div class="one-third">
@@ -115,6 +138,36 @@ class Search {
               ${data.campuses.length ? '</ul>' : ''}
 
             <h2 class="search-overlay__section-title">Events</h2>
+
+            ${
+              data.events.length
+                ? ''
+                : `<p>No results.</p><a href="${universityData.root_url}/events">View all events.</a>`
+            }
+              ${data.events
+                .map(
+                  (item) =>
+                    `
+                    <div class="event-summary">
+                      <a class="event-summary__date t-center" href="${item.permalink}">
+                        <span class="event-summary__month">
+                         ${item.month}
+                        </span>
+                        <span class="event-summary__day">${item.day}</span>
+                      </a>
+                      <div class="event-summary__content">
+                        <h5 class="event-summary__title headline headline--tiny"><a href="${item.permalink}">${item.title}</a></h5>
+                        <p>
+                          ${item.description}
+                          <a href="${item.permalink}" class="nu gray">Learn more</a>
+                        </p>
+                      </div>
+                    </div>
+                    `
+                )
+                .join('')}
+      
+      
           </div>
 
         </div>
