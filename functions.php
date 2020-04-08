@@ -99,3 +99,46 @@ function university_api_key($api)
 }
 
 add_filter('acf/fields/google_map/api', 'university_api_key');
+
+function redirectSubsHome()
+{
+  $currentUser = wp_get_current_user();
+  if (count($currentUser->roles) == 1 && $currentUser->roles[0] == 'subscriber') {
+    wp_redirect(esc_url(site_url('/')));
+    exit;
+  }
+}
+
+add_action('admin_init', 'redirectSubsHome');
+
+function noAdminBar()
+{
+  $currentUser = wp_get_current_user();
+  if (count($currentUser->roles) == 1 && $currentUser->roles[0] == 'subscriber') {
+    show_admin_bar(false);
+  }
+}
+
+add_action('wp_loaded', 'noAdminBar');
+
+function headerURL()
+{
+  return esc_url(site_url('/'));
+}
+
+add_filter('login_headerurl', 'headerURL');
+
+function loginLogo()
+{
+  return get_bloginfo('name');
+}
+
+add_filter('login_headertitle', 'loginLogo');
+
+function loginCSS()
+{
+  wp_enqueue_style('university_main_styles', get_stylesheet_uri());
+  wp_enqueue_style('google_fonts', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
+}
+
+add_action('login_enqueue_scripts', 'loginCSS');
