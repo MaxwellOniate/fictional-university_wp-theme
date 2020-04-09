@@ -6,9 +6,10 @@ class Notes {
   }
 
   events() {
-    $('.delete-note').on('click', this.delete);
-    $('.edit-note').on('click', this.edit.bind(this));
-    $('.update-note').on('click', this.update.bind(this));
+    $('#my-notes').on('click', '.delete-note', this.delete);
+    $('#my-notes').on('click', '.edit-note', this.edit.bind(this));
+    $('#my-notes').on('click', '.update-note', this.update.bind(this));
+    $('.submit-note').on('click', this.create.bind(this));
   }
 
   edit(e) {
@@ -51,6 +52,49 @@ class Notes {
     note.data('state', 'cancel');
   }
 
+  create(e) {
+    var newNote = {
+      title: $('.new-note-title').val(),
+      content: $('.new-note-body').val(),
+      status: 'publish',
+    };
+
+    $.ajax({
+      beforeSend: (xhr) => {
+        xhr.setRequestHeader('X-WP-Nonce', universityData.nonce);
+      },
+      url: universityData.root_url + '/wp-json/wp/v2/note/',
+      type: 'POST',
+      data: newNote,
+      success: (res) => {
+        var newNoteHTML = `
+        <li data-id="${res.id}">
+
+          <input readonly class="note-title-field" type="text" value="${res.title.raw}">
+
+          <span class="edit-note"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</span>
+          <span class="delete-note"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</span>
+
+          <textarea readonly class="note-body-field">${res.content.raw}</textarea>
+
+          <span class="update-note btn btn--blue btn--small"><i class="fa fa-arrow-right" aria-hidden="true"></i> Save</span>
+
+        </li>
+        `;
+
+        $('.new-note-title, .new-note-body').val('');
+        $(newNoteHTML).prependTo('#my-notes').hide().slideDown();
+        console.log(res);
+      },
+      error: (res) => {
+        if (res.responseText == 'You have reached your note limit.') {
+          $('.note-limit-message').addClass('active');
+        }
+        console.log(res);
+      },
+    });
+  }
+
   update(e) {
     var note = $(e.target).parents('li');
 
@@ -88,6 +132,9 @@ class Notes {
       success: (res) => {
         note.slideUp();
         console.log(res);
+        if (res.userNoteCount < 5) {
+          $('.note-limit-message').removeClass('active');
+        }
       },
       error: (res) => {
         console.log(res);
