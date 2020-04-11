@@ -34,9 +34,17 @@ function createLike($data)
   }
 }
 
-function deleteLike()
+function deleteLike($data)
 {
-  return 'Thanks for deleting!';
+  $likeID = sanitize_text_field($data['like']);
+
+  if (get_current_user_id() == get_post_field('post_author', $likeID) && get_post_type($likeID) == 'like') {
+    wp_delete_post($likeID, true);
+
+    return 'Like deleted.';
+  } else {
+    die('You do not have permission to delete this like.');
+  }
 }
 
 function university_like_routes()

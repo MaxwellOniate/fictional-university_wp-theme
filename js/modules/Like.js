@@ -12,7 +12,7 @@ class Like {
   clickDispatcher(e) {
     var currentLikeBox = $(e.target).closest('.like-box');
 
-    if (currentLikeBox.data('exists') == 'yes') {
+    if (currentLikeBox.attr('data-exists') == 'yes') {
       this.deleteLike(currentLikeBox);
     } else {
       this.createLike(currentLikeBox);
@@ -38,6 +38,8 @@ class Like {
 
         currentLikeBox.find('.like-count').html(likeCount);
 
+        currentLikeBox.attr('data-like', res);
+
         console.log(res);
       },
       error: (res) => {
@@ -46,11 +48,27 @@ class Like {
     });
   }
 
-  deleteLike() {
+  deleteLike(currentLikeBox) {
     $.ajax({
+      beforeSend: (xhr) => {
+        xhr.setRequestHeader('X-WP-Nonce', universityData.nonce);
+      },
       url: universityData.root_url + '/wp-json/university/v1/like',
       type: 'DELETE',
+      data: {
+        like: currentLikeBox.attr('data-like'),
+      },
       success: (res) => {
+        currentLikeBox.attr('data-exists', 'no');
+
+        var likeCount = parseInt(currentLikeBox.find('.like-count').html(), 10);
+
+        likeCount--;
+
+        currentLikeBox.find('.like-count').html(likeCount);
+
+        currentLikeBox.attr('data-like', '');
+
         console.log(res);
       },
       error: (res) => {
